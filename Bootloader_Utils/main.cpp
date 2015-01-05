@@ -240,6 +240,10 @@ int main(int argc, char* argv[])
 {
 
 
+	if (argc < 3) {
+		fprintf(stderr, "usage <comport> <path_to_cycad>\n");
+		exit(1);
+	}
 
 	CyBtldr_CommunicationsData cyComms = {
 		&OpenConnection,
