@@ -6,7 +6,7 @@
 #include "cybtldr_api2.h"
 
 static HANDLE hComm;
-static TCHAR gszPort[26] = L"COM2";
+static char gszPort[26] = "COM2";
 
 
 VOID CommSetBaud(VOID)
@@ -58,8 +58,11 @@ int SetTimeouts(void)
 	return 0;
 
 }
+
 static int OpenConnection(void)
 {
+	printf("opening com port %s\n",gszPort);
+
 	hComm = CreateFile(gszPort,
 	                   GENERIC_READ | GENERIC_WRITE,
 	                   0,
@@ -77,6 +80,8 @@ static int OpenConnection(void)
 		return 1;
 	}
 
+	printf("com port open, setting baud and timeouts\n");
+
 	CommSetBaud();
 
 	SetTimeouts();
@@ -87,6 +92,7 @@ static int OpenConnection(void)
 static int CloseConnection(void)
 {
 
+	printf("\nclosing com port\n");
 	CloseHandle(hComm);
 	hComm = 0;
 
@@ -106,11 +112,12 @@ void error_display(void)
 	    (LPTSTR)&lpMsgBuf,
 	    0,
 	    NULL
+
 	);
-	// Process any inserts in lpMsgBuf.
-	// ...
+
 	// Display the string.
-	MessageBox(NULL, (LPCTSTR)lpMsgBuf, L"Error", MB_OK | MB_ICONINFORMATION);
+	MessageBox(NULL, (LPCTSTR)lpMsgBuf, "Error", MB_OK | MB_ICONINFORMATION);
+
 	// Free the buffer.
 	LocalFree(lpMsgBuf);
 }
@@ -244,7 +251,10 @@ int main(int argc, char* argv[])
 
 	printf("Programming\n");
 
-	int result = CyBtldr_Program(argv[1],
+	// copy com port
+	strcpy_s(gszPort, sizeof( gszPort ), argv[1]);
+
+	int result = CyBtldr_Program(argv[2],
 	                             &cyComms,
 	                             &ProgressUpdate
 	                            );
