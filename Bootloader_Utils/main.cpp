@@ -94,6 +94,7 @@ static int CloseConnection(void)
 
 	printf("\nclosing com port\n");
 	CloseHandle(hComm);
+
 	hComm = 0;
 
 	return 0;
@@ -175,7 +176,7 @@ BOOL WriteABuffer(unsigned char * lpBuf, DWORD dwToWrite)
 	}
 
 	// Issue write.
-	if (!WriteFile(hComm, &lpBuf[1], dwToWrite, &dwWritten, &osWrite)) {
+	if (!WriteFile(hComm, &lpBuf[0], dwToWrite, &dwWritten, &osWrite)) {
 		if (GetLastError() != ERROR_IO_PENDING) {
 			// WriteFile failed, but isn't delayed. Report error and abort.
 			fRes = FALSE;
@@ -212,18 +213,9 @@ BOOL WriteABuffer(unsigned char * lpBuf, DWORD dwToWrite)
 
 static int WriteData(unsigned char* data, int count)
 {
-	unsigned char buf[65];
-	int i;
+	int result = WriteABuffer(data, count);
 
-	memset(buf, 0, sizeof(buf));
-
-	for (i = 0; i < count; ++i) {
-		buf[i + 1] = data[i];
-	}
-
-	int result = WriteABuffer(&buf[0], count);
-
-	printf("write %d, %d\r", count, result);
+	printf("wrote %d, %d\r", count, result);
 
 	return (result >= 0) ? 0 : -1;
 }
